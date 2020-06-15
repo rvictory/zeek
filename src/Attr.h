@@ -10,6 +10,15 @@
 
 ZEEK_FORWARD_DECLARE_NAMESPACED(Expr, zeek::detail);
 
+namespace zeek {
+class Type;
+using TypePtr = IntrusivePtr<Type>;
+
+namespace detail {
+using ExprPtr = zeek::IntrusivePtr<Expr>;
+}
+}
+
 // Note that there are two kinds of attributes: the kind (here) which
 // modify expressions or supply metadata on types, and the kind that
 // are extra metadata on every variable instance.
@@ -60,17 +69,22 @@ enum attr_tag {
 	NUM_ATTRS // this item should always be last
 };
 
+class Attr;
+using AttrPtr = zeek::IntrusivePtr<Attr>;
+class Attributes;
+using AttributesPtr = zeek::IntrusivePtr<Attributes>;
+
 class Attr final : public BroObj {
 public:
-	static inline const zeek::IntrusivePtr<zeek::detail::Attr> nil;
+	static inline const AttrPtr nil;
 
-	Attr(attr_tag t, zeek::IntrusivePtr<zeek::detail::Expr> e);
+	Attr(attr_tag t, ExprPtr e);
 	explicit Attr(attr_tag t);
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 	[[deprecated("Remove in v4.1. Use version that takes zeek::detail::attr_tag.")]]
-	Attr(::attr_tag t, zeek::IntrusivePtr<zeek::detail::Expr> e);
+	Attr(::attr_tag t, ExprPtr e);
 
 	[[deprecated("Remove in v4.1. Use version that takes zeek::detail::attr_tag.")]]
 	explicit Attr(::attr_tag t);
@@ -83,10 +97,10 @@ public:
 	[[deprecated("Remove in v4.1.  Use GetExpr().")]]
 	zeek::detail::Expr* AttrExpr() const	{ return expr.get(); }
 
-	const zeek::IntrusivePtr<zeek::detail::Expr>& GetExpr() const
+	const ExprPtr& GetExpr() const
 		{ return expr; }
 
-	void SetAttrExpr(zeek::IntrusivePtr<zeek::detail::Expr> e);
+	void SetAttrExpr(ExprPtr e);
 
 	void Describe(ODesc* d) const override;
 	void DescribeReST(ODesc* d, bool shorten = false) const;
@@ -109,22 +123,22 @@ protected:
 	void AddTag(ODesc* d) const;
 
 	attr_tag tag;
-	zeek::IntrusivePtr<Expr> expr;
+	ExprPtr expr;
 };
 
 // Manages a collection of attributes.
 class Attributes final : public BroObj {
 public:
 	[[deprecated("Remove in v4.1.  Construct using IntrusivePtrs instead.")]]
-	Attributes(attr_list* a, zeek::IntrusivePtr<Type> t, bool in_record, bool is_global);
+	Attributes(attr_list* a, zeek::TypePtr t, bool in_record, bool is_global);
 
-	Attributes(std::vector<zeek::IntrusivePtr<Attr>> a, zeek::IntrusivePtr<Type> t,
+	Attributes(std::vector<AttrPtr> a, zeek::TypePtr t,
 	           bool in_record, bool is_global);
-	Attributes(zeek::IntrusivePtr<Type> t, bool in_record, bool is_global);
+	Attributes(TypePtr t, bool in_record, bool is_global);
 
-	void AddAttr(zeek::IntrusivePtr<Attr> a);
+	void AddAttr(AttrPtr a);
 
-	void AddAttrs(const zeek::IntrusivePtr<Attributes>& a);
+	void AddAttrs(const AttributesPtr& a);
 
 	[[deprecated("Remove in v4.1. Pass IntrusivePtr instead.")]]
 	void AddAttrs(Attributes* a);	// Unref's 'a' when done
@@ -132,7 +146,7 @@ public:
 	[[deprecated("Remove in v4.1. Use Find().")]]
 	Attr* FindAttr(attr_tag t) const;
 
-	const zeek::IntrusivePtr<Attr>& Find(attr_tag t) const;
+	const AttrPtr& Find(attr_tag t) const;
 
 	void RemoveAttr(attr_tag t);
 
@@ -147,7 +161,7 @@ public:
 	void Describe(ODesc* d) const override;
 	void DescribeReST(ODesc* d, bool shorten = false) const;
 
-	const std::vector<zeek::IntrusivePtr<Attr>>& Attrs() const
+	const std::vector<AttrPtr>& Attrs() const
 		{ return attrs; }
 
 	bool operator==(const Attributes& other) const;
@@ -155,8 +169,8 @@ public:
 protected:
 	void CheckAttr(Attr* attr);
 
-	zeek::IntrusivePtr<Type> type;
-	std::vector<zeek::IntrusivePtr<Attr>> attrs;
+	TypePtr type;
+	std::vector<AttrPtr> attrs;
 	bool in_record;
 	bool global_var;
 };

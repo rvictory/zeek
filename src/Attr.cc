@@ -25,7 +25,7 @@ const char* attr_name(attr_tag t)
 	return attr_names[int(t)];
 	}
 
-Attr::Attr(attr_tag t, zeek::IntrusivePtr<Expr> e)
+Attr::Attr(attr_tag t, ExprPtr e)
 	: expr(std::move(e))
 	{
 	tag = t;
@@ -39,7 +39,7 @@ Attr::Attr(attr_tag t)
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-Attr::Attr(::attr_tag t, zeek::IntrusivePtr<Expr> e) : Attr(static_cast<attr_tag>(t), e)
+Attr::Attr(::attr_tag t, ExprPtr e) : Attr(static_cast<attr_tag>(t), e)
 	{
 	}
 
@@ -50,7 +50,7 @@ Attr::Attr(::attr_tag t) : Attr(static_cast<attr_tag>(t))
 
 Attr::~Attr() = default;
 
-void Attr::SetAttrExpr(zeek::IntrusivePtr<zeek::detail::Expr> e)
+void Attr::SetAttrExpr(ExprPtr e)
 	{ expr = std::move(e); }
 
 void Attr::Describe(ODesc* d) const
@@ -149,7 +149,7 @@ void Attr::AddTag(ODesc* d) const
 		d->Add(attr_name(Tag()));
 	}
 
-Attributes::Attributes(attr_list* a, zeek::IntrusivePtr<Type> t, bool arg_in_record, bool is_global)
+Attributes::Attributes(attr_list* a, TypePtr t, bool arg_in_record, bool is_global)
 	{
 	attrs.reserve(a->length());
 	in_record = arg_in_record;
@@ -167,15 +167,13 @@ Attributes::Attributes(attr_list* a, zeek::IntrusivePtr<Type> t, bool arg_in_rec
 	delete a;
 	}
 
-Attributes::Attributes(zeek::IntrusivePtr<Type> t,
-                       bool arg_in_record, bool is_global)
-    : Attributes(std::vector<zeek::IntrusivePtr<Attr>>{}, std::move(t),
+Attributes::Attributes(TypePtr t, bool arg_in_record, bool is_global)
+    : Attributes(std::vector<AttrPtr>{}, std::move(t),
                  arg_in_record, is_global)
     {}
 
-Attributes::Attributes(std::vector<zeek::IntrusivePtr<Attr>> a,
-                       zeek::IntrusivePtr<Type> t,
-                       bool arg_in_record, bool is_global)
+Attributes::Attributes(std::vector<AttrPtr> a,
+                       TypePtr t, bool arg_in_record, bool is_global)
 	: type(std::move(t))
 	{
 	attrs.reserve(a.size());
@@ -192,7 +190,7 @@ Attributes::Attributes(std::vector<zeek::IntrusivePtr<Attr>> a,
 		AddAttr(std::move(attr));
 	}
 
-void Attributes::AddAttr(zeek::IntrusivePtr<Attr> attr)
+void Attributes::AddAttr(AttrPtr attr)
 	{
 	// We overwrite old attributes by deleting them first.
 	RemoveAttr(attr->Tag());
@@ -214,7 +212,7 @@ void Attributes::AddAttr(zeek::IntrusivePtr<Attr> attr)
 		attrs.emplace_back(zeek::make_intrusive<Attr>(ATTR_OPTIONAL));
 	}
 
-void Attributes::AddAttrs(const zeek::IntrusivePtr<Attributes>& a)
+void Attributes::AddAttrs(const AttributesPtr& a)
 	{
 	for ( const auto& attr : a->Attrs() )
 		AddAttr(attr);
@@ -237,7 +235,7 @@ Attr* Attributes::FindAttr(attr_tag t) const
 	return nullptr;
 	}
 
-const zeek::IntrusivePtr<Attr>& Attributes::Find(attr_tag t) const
+const AttrPtr& Attributes::Find(attr_tag t) const
 	{
 	for ( const auto& a : attrs )
 		if ( a->Tag() == t )
