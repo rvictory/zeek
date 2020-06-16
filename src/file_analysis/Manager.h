@@ -14,8 +14,8 @@
 
 #include "analyzer/Tag.h"
 
-class TableVal;
-class VectorVal;
+ZEEK_FORWARD_DECLARE_NAMESPACED(TableVal, zeek);
+ZEEK_FORWARD_DECLARE_NAMESPACED(VectorVal, zeek);
 
 namespace analyzer {
 class Analyzer;
@@ -254,7 +254,7 @@ public:
 	 *         else true.
 	 */
 	bool SetExtractionLimit(const std::string& file_id,
-	                        RecordValPtr args, uint64_t n) const;
+	                        zeek::RecordValPtr args, uint64_t n) const;
 
 	[[deprecated("Remove in v4.1.  Pass IntrusivePtr args param instead.")]]
 	bool SetExtractionLimit(const std::string& file_id, RecordVal* args,
@@ -278,7 +278,7 @@ public:
 	 * @return false if the analyzer failed to be instantiated, else true.
 	 */
 	bool AddAnalyzer(const std::string& file_id, const file_analysis::Tag& tag,
-	                 RecordValPtr args) const;
+	                 zeek::RecordValPtr args) const;
 
 	[[deprecated("Remove in v4.1.  Pass IntrusivePtr args param instead.")]]
 	bool AddAnalyzer(const std::string& file_id, const file_analysis::Tag& tag,
@@ -292,7 +292,7 @@ public:
 	 * @return true if the analyzer is active at the time of call, else false.
 	 */
 	bool RemoveAnalyzer(const std::string& file_id, const file_analysis::Tag& tag,
-	                    RecordValPtr args) const;
+	                    zeek::RecordValPtr args) const;
 
 	[[deprecated("Remove in v4.1.  Pass IntrusivePtr args param instead.")]]
 	bool RemoveAnalyzer(const std::string& file_id, const file_analysis::Tag& tag,
@@ -312,7 +312,7 @@ public:
 	 * @param f The file analzer is to be associated with.
 	 * @return The new analyzer instance or null if tag is invalid.
 	 */
-	Analyzer* InstantiateAnalyzer(const Tag& tag, RecordValPtr args,
+	Analyzer* InstantiateAnalyzer(const Tag& tag, zeek::RecordValPtr args,
 	                              File* f) const;
 
 	[[deprecated("Remove in v4.1.  Pass in IntrusivePtr args instead.")]]
@@ -427,7 +427,7 @@ private:
 	RuleFileMagicState* magic_state;	/**< File magic signature match state. */
 	MIMEMap mime_types;/**< Mapping of MIME types to analyzers. */
 
-	inline static TableVal* disabled = nullptr;	/**< Table of disabled analyzers. */
+	inline static zeek::TableVal* disabled = nullptr;	/**< Table of disabled analyzers. */
 	inline static zeek::TableType* tag_set_type = nullptr;	/**< Type for set[tag]. */
 
 	size_t cumulative_files;
@@ -438,7 +438,7 @@ private:
  * Returns a script-layer value corresponding to the \c mime_matches type.
  * @param m The MIME match information with which to populate the value.
  */
-VectorValPtr GenMIMEMatchesVal(const RuleMatcher::MIME_Matches& m);
+zeek::VectorValPtr GenMIMEMatchesVal(const RuleMatcher::MIME_Matches& m);
 
 } // namespace file_analysis
 

@@ -48,7 +48,7 @@ const zeek::TypePtr& zeek::id::find_type(std::string_view name)
 	return id->GetType();
 	}
 
-const ValPtr& zeek::id::find_val(std::string_view name)
+const zeek::ValPtr& zeek::id::find_val(std::string_view name)
 	{
 	auto id = global_scope()->Find(name);
 
@@ -59,7 +59,7 @@ const ValPtr& zeek::id::find_val(std::string_view name)
 	return id->GetVal();
 	}
 
-const ValPtr& zeek::id::find_const(std::string_view name)
+const zeek::ValPtr& zeek::id::find_const(std::string_view name)
 	{
 	auto id = global_scope()->Find(name);
 
@@ -147,7 +147,7 @@ void ID::ClearVal()
 	val = nullptr;
 	}
 
-void ID::SetVal(ValPtr v)
+void ID::SetVal(zeek::ValPtr v)
 	{
 	val = std::move(v);
 	Modified();
@@ -176,7 +176,7 @@ void ID::SetVal(ValPtr v)
 		}
 	}
 
-void ID::SetVal(ValPtr v, init_class c)
+void ID::SetVal(zeek::ValPtr v, init_class c)
 	{
 	if ( c == INIT_NONE || c == INIT_FULL )
 		{
@@ -226,7 +226,7 @@ void ID::SetVal(ExprPtr ev, init_class c)
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-void ID::SetVal(ValPtr v, ::init_class c)
+void ID::SetVal(zeek::ValPtr v, ::init_class c)
 	{
 	SetVal(v, static_cast<init_class>(c));
 	}

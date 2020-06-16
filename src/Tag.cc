@@ -17,7 +17,7 @@ Tag::Tag(zeek::EnumType* etype, type_t arg_type, subtype_t arg_subtype)
 	: Tag({zeek::NewRef{}, etype}, arg_type, arg_subtype)
 	{ }
 
-Tag::Tag(EnumValPtr arg_val)
+Tag::Tag(zeek::EnumValPtr arg_val)
 	{
 	assert(arg_val);
 
@@ -72,7 +72,7 @@ Tag& Tag::operator=(const Tag&& other) noexcept
 	return *this;
 	}
 
-const EnumValPtr& Tag::AsVal(const zeek::EnumTypePtr& etype) const
+const zeek::EnumValPtr& Tag::AsVal(const zeek::EnumTypePtr& etype) const
 	{
 	if ( ! val )
 		{
